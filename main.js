@@ -2,7 +2,7 @@ import './style.css'
 
 // #11
 
-const input = 'Jacek Kamil Robert Piotr';
+const input = 'Jacek Kamil Robert Piotr'
 
 const initials = input
     .split(' ')
@@ -36,13 +36,11 @@ const persons = [
 ]
 
 const maxMin = persons.reduce((acc, person) => {
-        if (acc.max < person.age) {
-            acc.max = person.age
+        return {
+            ...acc,
+            max: acc.max < person.age ? person.age : acc.max,
+            min: !acc.min || acc.min > person.age ? person.age : acc.min
         }
-        if (acc.min === 0 || acc.min > person.age) {
-            acc.min = person.age
-        }
-        return acc
     }, {
         max: 0,
         min: 0
@@ -58,14 +56,12 @@ const letters = [
     ['d', 'f', 'g'],
 ]
 const lettersNum = letters
-    .reduce((flattedArray, lettersArr) => flattedArray.concat(lettersArr), [])
+    .flat()
     .reduce((acc, letter) => {
-        if (letter in acc) {
-            acc[letter]++
-        } else {
-            acc[letter] = 1
+        return {
+            ...acc,
+            [letter]: acc[letter] ? acc[letter] + 1 : 1
         }
-        return acc
     }, {})
 console.log(lettersNum)
 
@@ -77,7 +73,7 @@ const countMiddleChars = givenStrings.reduce((acc, string) => {
     const firstChar = string.substr(0, 1)
     const lengthOfStringBody = string.substring(1, string.length - 1).length
     const lastChar = string.substr(string.length - 1)
-    return acc += firstChar + lengthOfStringBody + lastChar + ' '
+    return acc.concat(firstChar + lengthOfStringBody + lastChar + ' ')
 }, '')
 console.log(countMiddleChars)
 
@@ -94,19 +90,14 @@ const calcData = givenData.reduce((acc, obj) => {
     const operation = obj.type
     switch (operation) {
         case 'Add':
-            acc += obj.value
-            break
+            return acc + obj.value
         case 'Multiply':
-            acc *= obj.value
-            break
+            return acc * obj.value
         case 'Divide':
-            acc /= obj.value
-            break
+            return acc / obj.value
         case 'Subtract':
-            acc -= obj.value
-            break
+            return acc - obj.value
     }
-    return acc
 }, 0)
 console.log(calcData)
 
@@ -120,18 +111,14 @@ const objectifyMe = [
 ]
 
 const objectified = objectifyMe.reduce((acc, arr) => {
-    acc[arr[0]] = arr[1]
-    return acc
+    return {...acc, [arr[0]]: arr[1]}
 }, {})
 console.log(objectified)
 
 // #17
 
 const createArr = givenData.reduce((acc, obj) => {
-    const arr = []
-    arr.push(obj.type, obj.value)
-    acc.push(arr)
-    return acc
+    return [...acc, [obj.type, obj.value]]
 }, [])
 console.log(createArr)
 
@@ -180,7 +167,7 @@ const matchesResult = matches.reduce((acc, team) => {
             ...acc.scoresSum,
             [team.name]: pointsTotal
         },
-        numberOfMatches: team.scores.length,
+        numberOfMatches: acc.numberOfMatches + team.scores.length,
         winner: !acc.winner
             ? team.name
             : acc.scoresSum[acc.winner] > pointsTotal
@@ -232,27 +219,17 @@ const data = [
 
 const crashStats = data.reduce((acc, obj) => {
     const currTime = Date.parse(obj.time)
-    if (Date.parse(acc.driveEndedAt) < currTime) {
-        acc.driveEndedAt = obj.time
+    return {
+        ...acc,
+        driveStartedAt: Date.parse(acc.driveStartedAt) > currTime ? obj.time : acc.driveStartedAt,
+        driveEndedAt: Date.parse(acc.driveEndedAt) < currTime ? obj.time : acc.driveEndedAt,
+        avgV: acc.avgV + obj.v / data.length,
+        maxGear: acc.maxGear < obj.gear ? obj.gear : acc.maxGear,
+        minGear: acc.minGear <= 0 || acc.minGear > obj.gear ? obj.gear : acc.minGear,
+        maxV: acc.maxV < obj.v ? obj.v : acc.maxV,
+        minV: acc.minV <= 0 || acc.minV > obj.v ? obj.v : acc.minV,
+        driveDuration: (acc.driveDuration + currTime) / 1000
     }
-    if (Date.parse(acc.driveStartedAt) === 0 || Date.parse(acc.driveStartedAt) > currTime) {
-        acc.driveStartedAt = obj.time
-    }
-    if (acc.maxGear < obj.gear) {
-        acc.maxGear = obj.gear
-    }
-    if (acc.minGear === 0 || acc.minGear > obj.gear) {
-        acc.minGear = obj.gear
-    }
-    if (acc.maxV < obj.v) {
-        acc.maxV = obj.v
-    }
-    if (acc.minV === 0 || acc.minV > obj.v) {
-        acc.minV = obj.v
-    }
-    acc.avgV += obj.v / data.length
-    acc.driveDuration += currTime / 1000
-    return acc
 }, {
     driveStartedAt: Date(),
     driveEndedAt: '1970-01-01T00:00:00.704Z',
