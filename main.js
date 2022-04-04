@@ -174,12 +174,24 @@ const matches = [
 
 const matchesResult = matches.reduce((acc, team) => {
     const pointsTotal = team.scores.reduce((pointsSum, cur) => pointsSum += cur.points, 0)
-    acc.scoresSum[team.name] = pointsTotal
-    acc.numberOfMatches += team.scores.length
-    if (acc.scoresSum[team.name] > pointsTotal) {
-        acc.winner = team.name
+    return {
+        ...acc,
+        scoresSum: {
+            ...acc.scoresSum,
+            [team.name]: pointsTotal
+        },
+        numberOfMatches: team.scores.length,
+        winner: !acc.winner
+            ? team.name
+            : acc.scoresSum[acc.winner] > pointsTotal
+                ? acc.winner
+                : team.name,
+        loser: !acc.winner
+            ? team.name
+            : acc.scoresSum[acc.winner] > pointsTotal
+                ? team.name
+                : acc.winner
     }
-    return acc
 }, {scoresSum: {}, numberOfMatches: 0, winner: '', loser: ''})
 console.log(matchesResult)
 
